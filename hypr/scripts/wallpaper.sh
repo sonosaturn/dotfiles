@@ -7,8 +7,11 @@
 #   wallpaper.sh --restore         → riapplica l'ultimo wallpaper (per l'autostart)
 #
 # Layout monitor (aggiorna qui se cambi disposizione):
-LEFT_OUT="DP-4";  LEFT_W=2560;  LEFT_H=1440;  LEFT_X=0
-RIGHT_OUT="DP-3"; RIGHT_W=1920; RIGHT_H=1080; RIGHT_X=2560
+#   *_Y = posizione verticale fisica del monitor (offset rispetto al top del canvas).
+#   Allineamento CENTRO: DP-3 a y=180 = (1440-1080)/2. Va riportato nel crop, altrimenti
+#   il monitor destro mostra la fascia alta del panorama e appare "spostato in basso".
+LEFT_OUT="DP-4";  LEFT_W=2560;  LEFT_H=1440;  LEFT_X=0;    LEFT_Y=0
+RIGHT_OUT="DP-3"; RIGHT_W=1920; RIGHT_H=1080; RIGHT_X=2560; RIGHT_Y=180
 CANVAS_W=$(( LEFT_W + RIGHT_W ))           # 4480
 CANVAS_H=$LEFT_H                            # 1440 (monitor più alto)
 
@@ -41,11 +44,11 @@ start_span() { # $1 = file → stende il video sui due monitor ritagliando per s
   }')
 
   pkill -x mpvpaper 2>/dev/null; sleep 0.3
-  # Monitor sinistro: crop della sua porzione (LEFT_W x LEFT_H) a partire da offx
-  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${LEFT_W}:${LEFT_H}:$(( offx + LEFT_X )):${offy}" \
+  # Monitor sinistro: crop della sua porzione (LEFT_W x LEFT_H) a partire da offx, offy+offset_Y
+  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${LEFT_W}:${LEFT_H}:$(( offx + LEFT_X )):$(( offy + LEFT_Y ))" \
     "$LEFT_OUT" "$f" >/dev/null 2>&1 &
-  # Monitor destro: crop della sua porzione (RIGHT_W x RIGHT_H)
-  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${RIGHT_W}:${RIGHT_H}:$(( offx + RIGHT_X )):${offy}" \
+  # Monitor destro: crop della sua porzione (RIGHT_W x RIGHT_H), tenendo conto della y fisica
+  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${RIGHT_W}:${RIGHT_H}:$(( offx + RIGHT_X )):$(( offy + RIGHT_Y ))" \
     "$RIGHT_OUT" "$f" >/dev/null 2>&1 &
 }
 
