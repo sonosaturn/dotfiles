@@ -6,14 +6,16 @@
 #   wallpaper.sh --next            → cicla i video in ~/Videos/wallpapers (modalità memorizzata)
 #   wallpaper.sh --restore         → riapplica l'ultimo wallpaper (per l'autostart)
 #
-# Layout monitor (aggiorna qui se cambi disposizione):
-#   *_Y = posizione verticale fisica del monitor (offset rispetto al top del canvas).
-#   Allineamento CENTRO: DP-3 a y=180 = (1440-1080)/2. Va riportato nel crop, altrimenti
-#   il monitor destro mostra la fascia alta del panorama e appare "spostato in basso".
-LEFT_OUT="DP-4";  LEFT_W=2560;  LEFT_H=1440;  LEFT_X=0;    LEFT_Y=0
-RIGHT_OUT="DP-3"; RIGHT_W=1920; RIGHT_H=1080; RIGHT_X=2560; RIGHT_Y=180
-CANVAS_W=$(( LEFT_W + RIGHT_W ))           # 4480
-CANVAS_H=$LEFT_H                            # 1440 (monitor più alto)
+# Layout monitor (aggiorna qui se cambi disposizione/monitor):
+#   *_W / *_H   = risoluzione in pixel
+#   *_WMM/*_HMM = dimensioni FISICHE dell'area attiva in mm (da spec/EDID)
+# Le dimensioni fisiche compensano la diversa DENSITÀ DI PIXEL: DP-3 (23.8" 1080p,
+# ~3.64 px/mm) ha pixel più grandi di DP-4 (27" 1440p, ~4.29 px/mm). Allineando solo
+# in pixel, l'MSI "ingrandisce" il panorama → i bordi combaciano solo al centro e
+# l'offset cresce verso alto/basso. Scalando la fetta di ogni monitor in base ai mm,
+# la densità fisica torna uniforme. Disposizione: affiancati in orizzontale, centrati Y.
+LEFT_OUT="DP-4";  LEFT_W=2560; LEFT_H=1440; LEFT_WMM=596.74; LEFT_HMM=335.66   # Dell P2723DE 27"
+RIGHT_OUT="DP-3"; RIGHT_W=1920; RIGHT_H=1080; RIGHT_WMM=527.04; RIGHT_HMM=296.46 # MSI MAG241C 23.8"
 
 WALLDIR="$HOME/Videos/wallpapers"
 STATE="$HOME/.cache/wallpaper-state"        # riga1=mode, riga2=file
@@ -24,31 +26,40 @@ start_same() {  # $1 = file
   nohup mpvpaper -o "$MPV_OPTS panscan=1.0" ALL "$1" >/dev/null 2>&1 &
 }
 
-start_span() { # $1 = file → stende il video sui due monitor ritagliando per schermo
+start_span() { # $1 = file → stende il video sui due monitor, corretto per densità pixel
   local f="$1"
-  # dimensioni sorgente
-  local dims w h
+  local dims sw sh
   dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height \
          -of csv=s=x:p=0 "$f" 2>/dev/null)
-  w=${dims%x*}; h=${dims#*x}
-  if [ -z "$w" ] || [ -z "$h" ]; then
+  sw=${dims%x*}; sh=${dims#*x}
+  if [ -z "$sw" ] || [ -z "$sh" ]; then
     echo "Impossibile leggere le dimensioni di $f" >&2; return 1
   fi
-  # scala per COPRIRE il canvas combinato, poi centra
-  # s = max(CANVAS_W/w, CANVAS_H/h)  (in virgola mobile via awk)
-  read -r ws hs offx offy < <(awk -v w="$w" -v h="$h" -v cw="$CANVAS_W" -v ch="$CANVAS_H" 'BEGIN{
-    s1=cw/w; s2=ch/h; s=(s1>s2)?s1:s2;
-    ws=int(w*s+0.5); hs=int(h*s+0.5);
-    offx=int((ws-cw)/2); offy=int((hs-ch)/2);
-    print ws, hs, offx, offy
+
+  # Crop (cw:ch:cx:cy) per ciascun monitor, calcolati in mm. Il video è mappato sul
+  # desktop fisico in modo da COPRIRLO, centrato; ogni monitor ritaglia la sua porzione
+  # fisica e poi la scala alla propria risoluzione → densità del panorama uniforme.
+  read -r lcw lch lcx lcy rcw rch rcx rcy < <(awk \
+    -v sw="$sw" -v sh="$sh" \
+    -v lwmm="$LEFT_WMM" -v lhmm="$LEFT_HMM" \
+    -v rwmm="$RIGHT_WMM" -v rhmm="$RIGHT_HMM" 'BEGIN{
+      T=lwmm+rwmm; H=(lhmm>rhmm)?lhmm:rhmm;        # desktop fisico (mm)
+      q1=T/sw; q2=H/sh; q=(q1>q2)?q1:q2; p=1.0/q;   # mm per pixel sorgente (cover) e inverso
+      Lm=(sw*q-T)/2.0; Tm=(sh*q-H)/2.0;             # margini di centratura (mm)
+      # src_x(phx)=(phx+Lm)*p ; src_y(phy)=(phy+Tm)*p
+      lcx=int((0+Lm)*p+0.5);             lcy=int(((H-lhmm)/2.0+Tm)*p+0.5);
+      lcw=int(lwmm*p+0.5);               lch=int(lhmm*p+0.5);
+      rcx=int((lwmm+Lm)*p+0.5);          rcy=int(((H-rhmm)/2.0+Tm)*p+0.5);
+      rcw=int(rwmm*p+0.5);               rch=int(rhmm*p+0.5);
+      if(lcx+lcw>sw) lcw=sw-lcx; if(lcy+lch>sh) lch=sh-lcy;
+      if(rcx+rcw>sw) rcw=sw-rcx; if(rcy+rch>sh) rch=sh-rcy;
+      print lcw,lch,lcx,lcy,rcw,rch,rcx,rcy
   }')
 
   pkill -x mpvpaper 2>/dev/null; sleep 0.3
-  # Monitor sinistro: crop della sua porzione (LEFT_W x LEFT_H) a partire da offx, offy+offset_Y
-  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${LEFT_W}:${LEFT_H}:$(( offx + LEFT_X )):$(( offy + LEFT_Y ))" \
+  nohup mpvpaper -o "$MPV_OPTS --vf=crop=${lcw}:${lch}:${lcx}:${lcy},scale=${LEFT_W}:${LEFT_H}" \
     "$LEFT_OUT" "$f" >/dev/null 2>&1 &
-  # Monitor destro: crop della sua porzione (RIGHT_W x RIGHT_H), tenendo conto della y fisica
-  nohup mpvpaper -o "$MPV_OPTS --vf=scale=${ws}:${hs},crop=${RIGHT_W}:${RIGHT_H}:$(( offx + RIGHT_X )):$(( offy + RIGHT_Y ))" \
+  nohup mpvpaper -o "$MPV_OPTS --vf=crop=${rcw}:${rch}:${rcx}:${rcy},scale=${RIGHT_W}:${RIGHT_H}" \
     "$RIGHT_OUT" "$f" >/dev/null 2>&1 &
 }
 
