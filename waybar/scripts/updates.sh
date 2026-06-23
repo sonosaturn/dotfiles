@@ -5,6 +5,13 @@
 
 ICON=$(printf '')
 
+# Waybar lancia un'istanza del modulo per ogni monitor → due esecuzioni
+# simultanee. checkupdates usa un db temporaneo condiviso (/tmp/checkup-db-$UID):
+# senza serializzazione vanno in conflitto e una restituisce 0 aggiornamenti.
+# flock garantisce che girino una alla volta.
+exec 9>"/tmp/waybar-updates-$(id -u).lock"
+flock 9
+
 # Aggiornamenti ufficiali (checkupdates non tocca il db di sistema)
 official=$(checkupdates 2>/dev/null)
 off_count=$(printf '%s\n' "$official" | grep -c . )
