@@ -7,11 +7,17 @@ CITY="Rome"
 
 raw=$(curl -s --max-time 8 -A "curl/8" "https://wttr.in/${CITY}?format=j1&m" 2>/dev/null)
 
-printf '%s' "$raw" | CITY="$CITY" python3 - <<'PYEOF'
+# wttr.in non raggiungibile / rate-limit → fallback diretto (niente pipe rotta)
+if [ -z "$raw" ]; then
+  printf '{"text":"  --","tooltip":"Meteo non disponibile (wttr.in non raggiungibile)","class":"weather"}\n'
+  exit 0
+fi
+
+CITY="$CITY" RAW="$raw" python3 - <<'PYEOF'
 import sys, json, os
 
 city = os.environ.get("CITY", "")
-raw = sys.stdin.read()
+raw = os.environ.get("RAW", "")
 
 # icona di fallback: nf-fa-question (cloud-question non garantito) → usa cloud
 FALLBACK = ""  # nf-fa-cloud
