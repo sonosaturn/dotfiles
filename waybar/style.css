@@ -1,0 +1,79 @@
+/* Waybar · Catppuccin Mocha — versione base (rifinitura in Fase 4) */
+
+@define-color base    #1e1e2e;
+@define-color mantle  #181825;
+@define-color crust   #11111b;
+@define-color text    #cdd6f4;
+@define-color subtext #a6adc8;
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color mauve   #cba6f7;
+@define-color blue    #89b4fa;
+@define-color green   #a6e3a1;
+@define-color peach   #fab387;
+@define-color red     #f38ba8;
+
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 0;
+}
+
+window#waybar {
+  background: transparent;
+  color: @text;
+}
+
+.modules-left, .modules-center, .modules-right {
+  background: @base;
+  border-radius: 14px;
+  padding: 0 6px;
+}
+
+#workspaces {
+  padding: 0 4px;
+}
+
+#workspaces button {
+  color: @subtext;
+  padding: 0 8px;
+  margin: 4px 2px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+  color: @base;
+  background: @mauve;
+}
+
+#workspaces button:hover {
+  color: @text;
+  background: @surface0;
+}
+
+#window {
+  color: @subtext;
+  padding: 0 10px;
+}
+
+#clock {
+  color: @mauve;
+  padding: 0 14px;
+  font-weight: 700;
+}
+
+#cpu, #memory, #pulseaudio, #network, #tray {
+  padding: 0 12px;
+  margin: 4px 2px;
+  border-radius: 10px;
+  background: @surface0;
+}
+
+#cpu { color: @green; }
+#memory { color: @blue; }
+#pulseaudio { color: @peach; }
+#network { color: @mauve; }
+
+#pulseaudio.muted { color: @red; }
