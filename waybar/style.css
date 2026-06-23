@@ -1,4 +1,4 @@
-/* Waybar · Catppuccin Mocha — versione base (rifinitura in Fase 4) */
+/* Waybar · Catppuccin Mocha — Fase 4 (rifinitura) */
 
 @define-color base    #1e1e2e;
 @define-color mantle  #181825;
@@ -9,8 +9,10 @@
 @define-color surface1 #45475a;
 @define-color mauve   #cba6f7;
 @define-color blue    #89b4fa;
+@define-color sapphire #74c7ec;
 @define-color green   #a6e3a1;
 @define-color peach   #fab387;
+@define-color yellow  #f9e2af;
 @define-color red     #f38ba8;
 
 * {
@@ -58,22 +60,64 @@ window#waybar {
   padding: 0 10px;
 }
 
-#clock {
-  color: @mauve;
-  padding: 0 14px;
-  font-weight: 700;
-}
-
-#cpu, #memory, #pulseaudio, #network, #tray {
+#mpris {
+  color: @green;
   padding: 0 12px;
   margin: 4px 2px;
   border-radius: 10px;
   background: @surface0;
 }
 
+#mpris.paused {
+  color: @subtext;
+}
+
+#clock {
+  color: @mauve;
+  padding: 0 14px;
+  font-weight: 700;
+}
+
+/* moduli di sistema e custom — base comune */
+#cpu, #memory, #pulseaudio, #network, #tray,
+#custom-weather, #custom-updates, #custom-power {
+  padding: 0 12px;
+  margin: 4px 2px;
+  border-radius: 10px;
+  background: @surface0;
+  transition: all 0.2s ease;
+}
+
+#cpu:hover, #memory:hover, #pulseaudio:hover, #network:hover,
+#custom-weather:hover, #custom-updates:hover, #custom-power:hover {
+  background: @surface1;
+}
+
 #cpu { color: @green; }
 #memory { color: @blue; }
 #pulseaudio { color: @peach; }
 #network { color: @mauve; }
+#custom-weather { color: @sapphire; }
 
 #pulseaudio.muted { color: @red; }
+
+/* updates: evidenzia se ci sono aggiornamenti, nascondi se aggiornato */
+#custom-updates.has-updates {
+  color: @base;
+  background: @yellow;
+}
+#custom-updates.updated {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+/* power: rosso, ben visibile a destra */
+#custom-power {
+  color: @red;
+  font-size: 15px;
+}
+#custom-power:hover {
+  color: @base;
+  background: @red;
+}
