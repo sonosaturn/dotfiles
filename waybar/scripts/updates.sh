@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # Waybar · conteggio aggiornamenti pacman + AUR (yay)
 # Output JSON per Waybar: text + tooltip + class
+# L'icona è definita per codepoint ( = nf-fa-refresh) per non perderla.
+
+ICON=$(printf '')
 
 # Aggiornamenti ufficiali (checkupdates non tocca il db di sistema)
 official=$(checkupdates 2>/dev/null)
 off_count=$(printf '%s\n' "$official" | grep -c . )
 
-# Aggiornamenti AUR (yay -Qua: query, niente sync/installazione)
+# Aggiornamenti AUR (yay -Qua: solo query, niente sync/installazione)
 aur=$(yay -Qua 2>/dev/null)
 aur_count=$(printf '%s\n' "$aur" | grep -c . )
 
@@ -23,5 +26,5 @@ tooltip=$(printf 'Ufficiali: %s · AUR: %s\n\n%s\n%s' \
   "$off_count" "$aur_count" "$official" "$aur" \
   | head -c 1500 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
 
-printf '{"text":"  %s","tooltip":"%s","class":"has-updates","alt":"has-updates"}\n' \
-  "$total" "$tooltip"
+printf '{"text":"%s  %s","tooltip":"%s","class":"has-updates","alt":"has-updates"}\n' \
+  "$ICON" "$total" "$tooltip"
