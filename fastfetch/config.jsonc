@@ -6,23 +6,23 @@
   },
   "display": {
     "separator": "  ",
-    "color": { "keys": "magenta", "title": "blue" }
+    "color": { "keys": "38;2;203;166;247", "title": "38;2;137;180;250" }
   },
   "modules": [
     "title",
     "separator",
-    { "type": "os", "key": " ", "keyColor": "red" },
-    { "type": "kernel", "key": " ", "keyColor": "peach" },
-    { "type": "uptime", "key": "祥 ", "keyColor": "yellow" },
-    { "type": "packages", "key": " ", "keyColor": "green" },
-    { "type": "shell", "key": " ", "keyColor": "teal" },
-    { "type": "wm", "key": " ", "keyColor": "blue" },
-    { "type": "terminal", "key": " ", "keyColor": "sapphire" },
+    { "type": "os",       "key": " ", "keyColor": "38;2;243;139;168" },
+    { "type": "kernel",   "key": " ", "keyColor": "38;2;250;179;135" },
+    { "type": "uptime",   "key": " ", "keyColor": "38;2;249;226;175" },
+    { "type": "packages", "key": "󰏖 ", "keyColor": "38;2;166;227;161" },
+    { "type": "shell",    "key": " ", "keyColor": "38;2;148;226;213" },
+    { "type": "wm",       "key": " ", "keyColor": "38;2;137;180;250" },
+    { "type": "terminal", "key": " ", "keyColor": "38;2;116;199;236" },
     "break",
-    { "type": "cpu", "key": " ", "keyColor": "magenta" },
-    { "type": "gpu", "key": "󰢮 ", "keyColor": "magenta" },
-    { "type": "memory", "key": " ", "keyColor": "mauve" },
-    { "type": "disk", "key": " ", "keyColor": "blue" },
+    { "type": "cpu",    "key": "󰍛 ", "keyColor": "38;2;203;166;247" },
+    { "type": "gpu",    "key": "󰢮 ", "keyColor": "38;2;245;194;231" },
+    { "type": "memory", "key": " ", "keyColor": "38;2;203;166;247" },
+    { "type": "disk",   "key": "󰋊 ", "keyColor": "38;2;137;180;250" },
     "break",
     { "type": "colors", "paddingLeft": 2, "symbol": "circle" }
   ]
