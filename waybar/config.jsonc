@@ -1,3 +1,4 @@
+// Waybar · Catppuccin Mocha — Fase 4 (glifi Nerd Font per codepoint)
 {
   "layer": "top",
   "position": "top",
@@ -6,52 +7,64 @@
   "margin-left": 10,
   "margin-right": 10,
   "spacing": 6,
-
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["mpris", "clock"],
-  "modules-right": ["custom/weather", "custom/updates", "cpu", "memory", "pulseaudio", "network", "tray", "custom/power"],
-
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+  "modules-center": [
+    "mpris",
+    "clock"
+  ],
+  "modules-right": [
+    "custom/weather",
+    "custom/updates",
+    "cpu",
+    "memory",
+    "pulseaudio",
+    "network",
+    "tray",
+    "custom/power"
+  ],
   "hyprland/workspaces": {
     "format": "{icon}",
     "on-click": "activate",
     "format-icons": {
-      "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
-      "6": "6", "7": "7", "8": "8", "9": "9", "10": "10",
-      "active": "",
-      "default": ""
+      "active": "",
+      "default": ""
     }
   },
-
   "hyprland/window": {
     "format": "{title}",
     "max-length": 50,
     "separate-outputs": true
   },
-
   "mpris": {
     "format": "{player_icon}  {dynamic}",
     "format-paused": "{status_icon}  <i>{dynamic}</i>",
-    "dynamic-order": ["artist", "title"],
+    "dynamic-order": [
+      "artist",
+      "title"
+    ],
     "dynamic-len": 38,
     "max-length": 45,
     "player-icons": {
-      "default": "",
-      "spotify": "",
-      "firefox": "",
-      "chromium": "",
-      "mpv": ""
+      "default": "",
+      "spotify": "",
+      "firefox": "",
+      "chromium": "",
+      "mpv": ""
     },
-    "status-icons": { "paused": "" },
+    "status-icons": {
+      "paused": ""
+    },
     "on-click": "playerctl play-pause",
     "on-click-right": "playerctl next",
     "tooltip-format": "{player}: {title} — {artist}"
   },
-
   "clock": {
-    "format": "  {:%H:%M  ·  %a %d %b}",
+    "format": "  {:%H:%M  ·  %a %d %b}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>"
   },
-
   "custom/weather": {
     "exec": "~/.config/waybar/scripts/weather.sh",
     "return-type": "json",
@@ -59,7 +72,6 @@
     "on-click": "xdg-open https://wttr.in",
     "tooltip": true
   },
-
   "custom/updates": {
     "exec": "~/.config/waybar/scripts/updates.sh",
     "return-type": "json",
@@ -67,38 +79,38 @@
     "on-click": "kitty -e bash -c 'yay -Syu; echo; read -n1 -p \"Premi un tasto per chiudere...\"'",
     "tooltip": true
   },
-
   "cpu": {
-    "format": "  {usage}%",
+    "format": "  {usage}%",
     "interval": 2
   },
-
   "memory": {
-    "format": "  {percentage}%",
+    "format": "  {percentage}%",
     "interval": 2
   },
-
   "pulseaudio": {
     "format": "{icon}  {volume}%",
-    "format-muted": "  muto",
-    "format-icons": { "default": ["", "", ""] },
+    "format-muted": "  muto",
+    "format-icons": {
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
   },
-
   "network": {
-    "format-wifi": "  {essid}",
-    "format-ethernet": "  {ipaddr}",
-    "format-disconnected": "  offline",
+    "format-wifi": "  {essid}",
+    "format-ethernet": "  {ipaddr}",
+    "format-disconnected": "  offline",
     "tooltip-format": "{ifname}: {ipaddr}"
   },
-
   "tray": {
     "icon-size": 16,
     "spacing": 8
   },
-
   "custom/power": {
-    "format": "",
+    "format": "",
     "on-click": "wlogout -b 5",
     "tooltip-format": "Power menu (SUPER+X)"
   }

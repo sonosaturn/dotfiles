@@ -1,26 +1,53 @@
 #!/usr/bin/env bash
-# Waybar · meteo attuale via wttr.in (nessun pacchetto extra, solo curl)
-# Cambia CITY con la tua città. Lascia vuoto ("") per auto-detect via IP.
+# Waybar · meteo attuale via wttr.in API JSON (format=j1)
+# Temperatura e condizione provengono dallo stesso blocco "current_condition"
+# mostrato nell'header della pagina wttr.in → niente discrepanze.
+# Cambia CITY con la tua città.
 CITY="Rome"
 
-# Formato: icona condizione + temperatura (es. "☀️ +22°C")
-# %c = icona condizione, %t = temperatura. format=1 → riga compatta.
-url="https://wttr.in/${CITY}?format=%c+%t&m"
+raw=$(curl -s --max-time 8 -A "curl/8" "https://wttr.in/${CITY}?format=j1&m" 2>/dev/null)
 
-resp=$(curl -s --max-time 8 "$url" 2>/dev/null)
+printf '%s' "$raw" | CITY="$CITY" python3 - <<'PYEOF'
+import sys, json, os
 
-# Fallback se rete assente o risposta anomala (wttr a volte risponde testo lungo)
-if [ -z "$resp" ] || printf '%s' "$resp" | grep -qiE 'unknown|error|html'; then
-  printf '{"text":"  --","tooltip":"Meteo non disponibile","class":"weather"}\n'
-  exit 0
-fi
+city = os.environ.get("CITY", "")
+raw = sys.stdin.read()
 
-# Pulizia spazi/escape per JSON
-text=$(printf '%s' "$resp" | tr -s ' ' | sed 's/^ *//;s/ *$//' | sed 's/"/\\"/g')
+# icona di fallback: nf-fa-question (cloud-question non garantito) → usa cloud
+FALLBACK = ""  # nf-fa-cloud
 
-# Tooltip esteso (3 righe) — best effort
-tip=$(curl -s --max-time 8 "https://wttr.in/${CITY}?format=%l:+%C+%t+(feels+%f),+vento+%w,+umidità+%h&m" 2>/dev/null \
-  | tr -s ' ' | sed 's/"/\\"/g')
-[ -z "$tip" ] && tip="$CITY"
+def out(text, tooltip):
+    print(json.dumps({"text": text, "tooltip": tooltip, "class": "weather"},
+                     ensure_ascii=False))
 
-printf '{"text":"%s","tooltip":"%s","class":"weather"}\n' "$text" "$tip"
+try:
+    data = json.loads(raw)
+    cur = data["current_condition"][0]
+    temp  = cur["temp_C"]
+    code  = int(cur["weatherCode"])
+    desc  = cur["weatherDesc"][0]["value"]
+    feels = cur["FeelsLikeC"]
+    wind  = cur["windspeedKmph"]
+    hum   = cur["humidity"]
+except Exception:
+    out(FALLBACK + "  --", "Meteo non disponibile")
+    sys.exit(0)
+
+# WWO weatherCode -> glifo nf-weather (Weather Icons)
+def icon(c):
+    if c == 113:                                   return ""  # sereno/sole
+    if c == 116:                                   return ""  # poco nuvoloso
+    if c in (119, 122):                            return ""  # nuvoloso/coperto
+    if c in (143, 248, 260):                       return ""  # nebbia
+    if c in (176, 263, 266, 293, 296, 353):        return ""  # pioggia debole/rovesci
+    if c in (299, 302, 305, 308, 356, 359):        return ""  # pioggia forte
+    if c in (179, 182, 185, 227, 230, 323, 326,
+             329, 332, 335, 338, 368, 371, 374, 377): return ""  # neve
+    if c in (200, 386, 389, 392, 395):             return ""  # temporale
+    return ""
+
+sign = "" if temp.startswith("-") else "+"
+text = f"{icon(code)}  {sign}{temp}°C"
+tip  = f"{city}: {desc} {sign}{temp}°C (percepiti {feels}°C), vento {wind} km/h, umidità {hum}%"
+out(text, tip)
+PYEOF
