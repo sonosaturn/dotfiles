@@ -1,0 +1,11 @@
+configuration {
+    modi:                "drun,run,window";
+    show-icons:          true;
+    drun-display-format: "{name}";
+    display-drun:        "  Apps";
+    display-run:         "  Esegui";
+    display-window:      "  Finestre";
+    font:                "JetBrainsMono Nerd Font 12";
+}
+
+@theme "catppuccin-mocha"
