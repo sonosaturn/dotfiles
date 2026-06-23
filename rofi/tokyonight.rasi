@@ -1,11 +1,11 @@
 * {
-    bg:      #1e1e2e;
-    bg-alt:  #181825;
-    fg:      #cdd6f4;
-    fg-alt:  #6c7086;
-    mauve:   #cba6f7;
-    blue:    #89b4fa;
-    surface: #313244;
+    bg:      #1a1b26;
+    bg-alt:  #16161e;
+    fg:      #c0caf5;
+    fg-alt:  #565f89;
+    accent:  #7aa2f7;
+    accent2: #7dcfff;
+    surface: #292e42;
 
     background-color: transparent;
     text-color:       @fg;
@@ -17,7 +17,7 @@
 window {
     background-color: @bg;
     border:           2px;
-    border-color:     @mauve;
+    border-color:     @accent;
     border-radius:    16px;
     width:            600px;
     location:         center;
@@ -36,7 +36,7 @@ inputbar {
 }
 
 prompt {
-    text-color: @mauve;
+    text-color: @accent;
 }
 
 entry {
@@ -64,7 +64,7 @@ element normal.normal {
 }
 
 element selected.normal {
-    background-color: @mauve;
+    background-color: @accent;
     text-color:       @bg;
 }
 

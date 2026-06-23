@@ -1,19 +1,19 @@
-/* Waybar · Catppuccin Mocha — Fase 4 (rifinitura) */
+/* Waybar · Tokyo Night — Fase 4 (rifinitura) */
 
-@define-color base    #1e1e2e;
-@define-color mantle  #181825;
-@define-color crust   #11111b;
-@define-color text    #cdd6f4;
-@define-color subtext #a6adc8;
-@define-color surface0 #313244;
-@define-color surface1 #45475a;
-@define-color mauve   #cba6f7;
-@define-color blue    #89b4fa;
-@define-color sapphire #74c7ec;
-@define-color green   #a6e3a1;
-@define-color peach   #fab387;
-@define-color yellow  #f9e2af;
-@define-color red     #f38ba8;
+@define-color base    #1a1b26;
+@define-color mantle  #16161e;
+@define-color crust   #15161e;
+@define-color text    #c0caf5;
+@define-color subtext #a9b1d6;
+@define-color surface0 #292e42;
+@define-color surface1 #414868;
+@define-color mauve   #7aa2f7;
+@define-color blue    #7dcfff;
+@define-color sapphire #2ac3de;
+@define-color green   #9ece6a;
+@define-color peach   #ff9e64;
+@define-color yellow  #e0af68;
+@define-color red     #f7768e;
 
 * {
   font-family: "JetBrainsMono Nerd Font", monospace;

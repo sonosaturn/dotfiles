@@ -8,4 +8,4 @@ configuration {
     font:                "JetBrainsMono Nerd Font 12";
 }
 
-@theme "catppuccin-mocha"
+@theme "tokyonight"
