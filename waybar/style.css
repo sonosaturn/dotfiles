@@ -80,7 +80,7 @@ window#waybar {
 
 /* moduli di sistema e custom — base comune */
 #cpu, #memory, #pulseaudio, #network, #tray,
-#custom-weather, #custom-updates, #custom-power {
+#custom-weather, #custom-updates, #custom-swaync, #custom-power {
   padding: 0 12px;
   margin: 4px 2px;
   border-radius: 10px;
@@ -89,9 +89,15 @@ window#waybar {
 }
 
 #cpu:hover, #memory:hover, #pulseaudio:hover, #network:hover,
-#custom-weather:hover, #custom-updates:hover, #custom-power:hover {
+#custom-weather:hover, #custom-updates:hover, #custom-swaync:hover, #custom-power:hover {
   background: @surface1;
 }
+
+/* notifiche: ciano normale, giallo se ce ne sono, spento in DND */
+#custom-swaync { color: @sapphire; }
+#custom-swaync.notification { color: @yellow; }
+#custom-swaync.dnd-notification,
+#custom-swaync.dnd-none { color: @subtext; }
 
 #cpu { color: @green; }
 #memory { color: @blue; }

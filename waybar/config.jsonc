@@ -23,6 +23,7 @@
     "pulseaudio",
     "network",
     "tray",
+    "custom/swaync",
     "custom/power"
   ],
   "hyprland/workspaces": {
@@ -76,7 +77,8 @@
     "exec": "~/.config/waybar/scripts/updates.sh",
     "return-type": "json",
     "interval": 1800,
-    "on-click": "kitty -e bash -c 'yay -Syu; echo; read -n1 -p \"Premi un tasto per chiudere...\"'",
+    "signal": 8,
+    "on-click": "kitty -e bash -c 'yay -Syu; echo; read -n1 -p \"Premi un tasto per chiudere...\"'; pkill -RTMIN+8 waybar",
     "tooltip": true
   },
   "cpu": {
@@ -113,5 +115,25 @@
     "format": "",
     "on-click": "wlogout -b 5",
     "tooltip-format": "Power menu (SUPER+X)"
+  },
+  "custom/swaync": {
+    "format": "{icon} {}",
+    "format-icons": {
+      "notification": "󱅫",
+      "none": "󰂜",
+      "dnd-notification": "󰂠",
+      "dnd-none": "󰪑",
+      "inhibited-notification": "󱅫",
+      "inhibited-none": "󰂜",
+      "dnd-inhibited-notification": "󰂠",
+      "dnd-inhibited-none": "󰪑"
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "tooltip-format": "Notifiche (SUPER+N) · tasto destro: Non disturbare",
+    "escape": true
   }
 }

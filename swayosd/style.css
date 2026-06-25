@@ -1,0 +1,36 @@
+/* swayosd · Tokyo Night — Fase 6 (OSD volume/luminosità) */
+
+window {
+  border-radius: 16px;
+  border: 1px solid #292e42;
+  background: #16161e;
+  padding: 6px;
+}
+
+#container {
+  margin: 14px;
+}
+
+image,
+label {
+  color: #c0caf5;
+}
+
+progressbar {
+  border-radius: 999px;
+  min-height: 8px;
+  background: transparent;
+}
+
+trough {
+  border-radius: 999px;
+  min-height: 8px;
+  background: #292e42;
+  border: none;
+}
+
+progress {
+  border-radius: 999px;
+  min-height: 8px;
+  background: #7aa2f7;
+}

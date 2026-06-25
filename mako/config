@@ -1,0 +1,37 @@
+# Mako · Tokyo Night — centro notifiche (Fase 6)
+# Demone attivo realmente (swaync non installato). default-timeout!=0
+# così le notifiche scadono da sole e non si accumulano.
+
+font=JetBrainsMono Nerd Font 11
+background-color=#1a1b26
+text-color=#c0caf5
+border-color=#7aa2f7
+progress-color=over #283457
+border-size=2
+border-radius=10
+padding=12
+margin=8
+icons=1
+max-icon-size=48
+default-timeout=6000
+ignore-timeout=0
+max-visible=5
+layer=overlay
+anchor=top-right
+width=380
+height=140
+outer-margin=8
+
+[urgency=low]
+border-color=#414868
+default-timeout=4000
+
+[urgency=normal]
+border-color=#7aa2f7
+default-timeout=6000
+
+# critical: bordo rosso ma NON eterno — eredita default-timeout=6000
+# (niente override del timeout qui, così non si accumulano nemmeno le critical)
+[urgency=critical]
+border-color=#f7768e
+text-color=#f7768e
