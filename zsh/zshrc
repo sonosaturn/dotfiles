@@ -46,3 +46,6 @@ eval "$(starship init zsh)"
 # ── Fetch all'apertura (commenta per disattivare) ──
 command -v fastfetch >/dev/null && fastfetch
 export PATH="$HOME/.local/bin:$PATH"
+
+# ── Secrets per knowledge base / graphify (file gitignorato, fuori dai dotfiles) ──
+[ -f "$HOME/.config/brain.env" ] && source "$HOME/.config/brain.env"
