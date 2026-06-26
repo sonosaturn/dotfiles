@@ -21,7 +21,7 @@ Singleton {
     readonly property color red:      "#f7768e"
 
     // Stile pannelli "cozy"
-    readonly property color panelBg:  "#e61a1b26"   // bg @ ~90% (ARGB)
+    readonly property color panelBg:  "#991a1b26"   // bg @ ~60% opaco (≈40% trasparente, ARGB)
     readonly property color border:   "#7aa2f7"
     readonly property int   borderWidth: 1
     readonly property int   radius:   18

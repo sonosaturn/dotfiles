@@ -129,7 +129,16 @@ PanelWindow {
             // Controlli centrati
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 26
+                spacing: 22
+                Text {
+                    visible: w.player && w.player.shuffleSupported
+                    text: ""   // nf-fa-random (shuffle)
+                    color: (w.player && w.player.shuffle) ? Theme.cyan : Theme.comment
+                    font.pixelSize: 18
+                    font.family: Theme.fontFamily
+                    MouseArea { anchors.fill: parent
+                        onClicked: if (w.player) w.player.shuffle = !w.player.shuffle }
+                }
                 Text {
                     text: ""       // nf-fa-backward (prev)
                     color: Theme.blue; font.pixelSize: 22
