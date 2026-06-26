@@ -80,7 +80,7 @@ window#waybar {
 
 /* moduli di sistema e custom — base comune */
 #cpu, #memory, #pulseaudio, #network, #tray,
-#custom-weather, #custom-updates, #custom-swaync, #custom-power {
+#custom-weather, #custom-updates, #custom-swaync, #custom-power, #custom-screenshot {
   padding: 0 12px;
   margin: 4px 2px;
   border-radius: 10px;
@@ -89,7 +89,8 @@ window#waybar {
 }
 
 #cpu:hover, #memory:hover, #pulseaudio:hover, #network:hover,
-#custom-weather:hover, #custom-updates:hover, #custom-swaync:hover, #custom-power:hover {
+#custom-weather:hover, #custom-updates:hover, #custom-swaync:hover, #custom-power:hover,
+#custom-screenshot:hover {
   background: @surface1;
 }
 
@@ -104,6 +105,7 @@ window#waybar {
 #pulseaudio { color: @peach; }
 #network { color: @mauve; }
 #custom-weather { color: @sapphire; }
+#custom-screenshot { color: @yellow; }
 
 #pulseaudio.muted { color: @red; }
 

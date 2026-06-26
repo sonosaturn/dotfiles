@@ -20,6 +20,7 @@
     "custom/updates",
     "cpu",
     "memory",
+    "custom/screenshot",
     "pulseaudio",
     "network",
     "tray",
@@ -88,6 +89,12 @@
   "memory": {
     "format": "  {percentage}%",
     "interval": 2
+  },
+  "custom/screenshot": {
+    "format": "",
+    "on-click": "~/.config/hypr/scripts/screenshot.sh menu",
+    "on-click-right": "~/.config/hypr/scripts/screenshot.sh region",
+    "tooltip-format": "Screenshot (menu) · tasto destro: area rapida"
   },
   "pulseaudio": {
     "format": "{icon}  {volume}%",
