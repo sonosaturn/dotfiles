@@ -10,18 +10,23 @@ PanelWindow {
     WlrLayershell.namespace: "qs-nowplaying"
     exclusionMode: ExclusionMode.Ignore
 
-    anchors { bottom: true; left: true }
-    margins { bottom: 40; left: 40 }
+    anchors { top: true; right: true }
+    margins { top: 52; right: 40 }
     implicitWidth: card.implicitWidth
     implicitHeight: card.implicitHeight
 
-    // Player attivo: primo in Playing, altrimenti il primo
+    // Player attivo: primo in Playing, altrimenti il primo con un titolo.
+    // Scarta i proxy vuoti (es. playerctld senza player reale) → placeholder.
     readonly property var player: {
         var ps = Mpris.players.values;
         if (!ps || ps.length === 0) return null;
-        for (var i = 0; i < ps.length; i++)
-            if (ps[i].playbackState === MprisPlaybackState.Playing) return ps[i];
-        return ps[0];
+        var firstReal = null;
+        for (var i = 0; i < ps.length; i++) {
+            var p = ps[i];
+            if (p.playbackState === MprisPlaybackState.Playing) return p;
+            if (!firstReal && p.trackTitle && p.trackTitle.length > 0) firstReal = p;
+        }
+        return firstReal;
     }
     readonly property bool hasPlayer: player !== null
 
@@ -39,31 +44,42 @@ PanelWindow {
         color: Theme.panelBg
         border.color: Theme.border
         border.width: Theme.borderWidth
-        implicitWidth: 360
-        implicitHeight: w.hasPlayer ? (content.implicitHeight + 28) : 60
+        // Card ritratto ~3:4 (larghezza ≈ clock +~10%); spazio per la coda in futuro
+        implicitWidth: 240
+        implicitHeight: 320
 
         // Placeholder: nessun player
-        Text {
+        Column {
             anchors.centerIn: parent
             visible: !w.hasPlayer
-            //  = nf-fa-music (Nerd Font v3, JetBrainsMono NF U+F001)
-            text: "  Niente in riproduzione"
-            color: Theme.comment
-            font.family: Theme.fontFamily; font.pixelSize: 15
+            spacing: 8
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: ""           // nf-fa-music
+                color: Theme.comment
+                font.family: Theme.fontFamily; font.pixelSize: 44
+            }
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Niente in riproduzione"
+                color: Theme.comment
+                font.family: Theme.fontFamily; font.pixelSize: 13
+            }
         }
 
-        Row {
+        // Now-playing verticale (copertina grande in alto)
+        Column {
             id: content
             visible: w.hasPlayer
-            anchors { fill: parent; margins: 14 }
-            spacing: 14
+            anchors { fill: parent; margins: 16 }
+            spacing: 8
 
-            // Copertina (o placeholder nota musicale)
+            // Copertina grande quadrata, centrata
             Rectangle {
-                width: 80; height: 80; radius: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 176; height: 176; radius: 12
                 color: Theme.surface0
                 clip: true
-                anchors.verticalCenter: parent.verticalCenter
                 Image {
                     id: artImg
                     anchors.fill: parent
@@ -74,69 +90,67 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     visible: artImg.status !== Image.Ready
-                    //  = nf-fa-music
-                    text: ""
+                    text: ""       // nf-fa-music
                     color: Theme.comment
-                    font.family: Theme.fontFamily; font.pixelSize: 28
+                    font.family: Theme.fontFamily; font.pixelSize: 48
                 }
             }
 
-            Column {
-                width: parent.width - 80 - 14
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 6
+            // Titolo
+            Text {
+                width: parent.width; horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+                text: w.player ? (w.player.trackTitle || "—") : "—"
+                color: Theme.fg; font.family: Theme.fontFamily
+                font.pixelSize: 15; font.bold: true
+            }
+            // Artista
+            Text {
+                width: parent.width; horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+                text: w.player ? (w.player.trackArtist || "") : ""
+                color: Theme.subtext; font.family: Theme.fontFamily
+                font.pixelSize: 12
+            }
 
-                Text {
-                    width: parent.width; elide: Text.ElideRight
-                    text: w.player ? (w.player.trackTitle || "—") : "—"
-                    color: Theme.fg; font.family: Theme.fontFamily
-                    font.pixelSize: 16; font.bold: true
-                }
-                Text {
-                    width: parent.width; elide: Text.ElideRight
-                    text: w.player ? (w.player.trackArtist || "") : ""
-                    color: Theme.subtext; font.family: Theme.fontFamily
-                    font.pixelSize: 13
-                }
-
-                // Controlli: =prev =play =pause =next (nf-fa-*)
-                Row {
-                    spacing: 18
-                    Text {
-                        text: ""
-                        color: Theme.blue; font.pixelSize: 20
-                        font.family: Theme.fontFamily
-                        MouseArea { anchors.fill: parent
-                            onClicked: if (w.player) w.player.previous() }
-                    }
-                    Text {
-                        text: (w.player && w.player.playbackState === MprisPlaybackState.Playing)
-                              ? "" : ""
-                        color: Theme.cyan; font.pixelSize: 22
-                        font.family: Theme.fontFamily
-                        MouseArea { anchors.fill: parent
-                            onClicked: if (w.player) w.player.togglePlaying() }
-                    }
-                    Text {
-                        text: ""
-                        color: Theme.blue; font.pixelSize: 20
-                        font.family: Theme.fontFamily
-                        MouseArea { anchors.fill: parent
-                            onClicked: if (w.player) w.player.next() }
-                    }
-                }
-
-                // Seek bar
+            // Seek bar
+            Rectangle {
+                width: parent.width; height: 6; radius: 3
+                color: Theme.surface0
+                visible: w.player && w.player.lengthSupported && w.player.length > 0
                 Rectangle {
-                    width: parent.width; height: 6; radius: 3
-                    color: Theme.surface0
-                    visible: w.player && w.player.lengthSupported && w.player.length > 0
-                    Rectangle {
-                        height: parent.height; radius: 3; color: Theme.blue
-                        width: (w.player && w.player.length > 0)
-                               ? parent.width * Math.min(w.player.position / w.player.length, 1)
-                               : 0
-                    }
+                    height: parent.height; radius: 3; color: Theme.blue
+                    width: (w.player && w.player.length > 0)
+                           ? parent.width * Math.min(w.player.position / w.player.length, 1)
+                           : 0
+                }
+            }
+
+            // Controlli centrati
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 26
+                Text {
+                    text: ""       // nf-fa-backward (prev)
+                    color: Theme.blue; font.pixelSize: 22
+                    font.family: Theme.fontFamily
+                    MouseArea { anchors.fill: parent
+                        onClicked: if (w.player) w.player.previous() }
+                }
+                Text {
+                    text: (w.player && w.player.playbackState === MprisPlaybackState.Playing)
+                          ? "" : ""   // pause : play
+                    color: Theme.cyan; font.pixelSize: 24
+                    font.family: Theme.fontFamily
+                    MouseArea { anchors.fill: parent
+                        onClicked: if (w.player) w.player.togglePlaying() }
+                }
+                Text {
+                    text: ""       // nf-fa-forward (next)
+                    color: Theme.blue; font.pixelSize: 22
+                    font.family: Theme.fontFamily
+                    MouseArea { anchors.fill: parent
+                        onClicked: if (w.player) w.player.next() }
                 }
             }
         }

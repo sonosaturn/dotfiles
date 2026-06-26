@@ -11,8 +11,8 @@ PanelWindow {
     WlrLayershell.namespace: "qs-sysmon"
     exclusionMode: ExclusionMode.Ignore
 
-    anchors { top: true; left: true }
-    margins { top: 40; left: 40 }
+    anchors { bottom: true; right: true }
+    margins { bottom: 40; right: 40 }
     implicitWidth: card.implicitWidth
     implicitHeight: card.implicitHeight
 

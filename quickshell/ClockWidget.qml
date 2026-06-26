@@ -9,8 +9,8 @@ PanelWindow {
     WlrLayershell.namespace: "qs-clock"
     exclusionMode: ExclusionMode.Ignore
 
-    anchors { top: true; right: true }
-    margins { top: 40; right: 40 }
+    anchors { top: true; left: true }
+    margins { top: 52; left: 40 }
     implicitWidth: card.implicitWidth
     implicitHeight: card.implicitHeight
 
