@@ -15,4 +15,6 @@ ShellRoot {
 
     Component.onCompleted: console.log("quickshell: targetScreen =",
         root.targetScreen ? root.targetScreen.name : "none")
+
+    ClockWidget { screen: root.targetScreen }
 }
