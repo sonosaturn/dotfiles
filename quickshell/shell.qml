@@ -17,4 +17,5 @@ ShellRoot {
         root.targetScreen ? root.targetScreen.name : "none")
 
     ClockWidget { screen: root.targetScreen }
+    SysMonitorWidget { screen: root.targetScreen }
 }
