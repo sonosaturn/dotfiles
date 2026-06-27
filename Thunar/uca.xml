@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Apri terminale qui</name>
+	<submenu></submenu>
+	<unique-id>1719500000000000-1</unique-id>
+	<command>kitty --working-directory %f</command>
+	<description>Apri kitty in questa cartella</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+</actions>

@@ -66,8 +66,9 @@ CONFIG_DIRS=(hypr waybar quickshell kitty rofi mako swayosd swaync
 for d in "${CONFIG_DIRS[@]}"; do
     [ -e "$DOTFILES/$d" ] && link "$DOTFILES/$d" "$HOME/.config/$d"
 done
-link "$DOTFILES/starship.toml" "$HOME/.config/starship.toml"
-link "$DOTFILES/zsh/zshrc"     "$HOME/.zshrc"
+link "$DOTFILES/starship.toml"  "$HOME/.config/starship.toml"
+link "$DOTFILES/zsh/zshrc"      "$HOME/.zshrc"
+link "$DOTFILES/Thunar/uca.xml" "$HOME/.config/Thunar/uca.xml"
 
 # ── 3. Shell di default ────────────────────────────────────
 if [ "${SHELL:-}" != "$(command -v zsh)" ]; then
