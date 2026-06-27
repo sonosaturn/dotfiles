@@ -35,3 +35,7 @@ default-timeout=6000
 [urgency=critical]
 border-color=#f7768e
 text-color=#f7768e
+
+# Do Not Disturb (Fase 9b) — toggle da control center: makoctl mode -t do-not-disturb
+[mode=do-not-disturb]
+invisible=1
