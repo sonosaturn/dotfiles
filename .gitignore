@@ -2,3 +2,9 @@
 *.log
 cache/
 .superpowers/
+
+# tooling AI / Claude (non fa parte del ricing)
+.claude/
+docs/
+AGENTS.md
+CLAUDE.md
