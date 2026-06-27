@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 
@@ -12,9 +13,39 @@ PanelWindow {
     anchors { top: true; bottom: true; left: true; right: true }
     exclusiveZone: 0
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: cc.visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // OnDemand: prende il focus solo quando ci clicchi sopra (ESC funziona),
+    // senza rubare la tastiera alle altre app finché non interagisci col pannello
+    WlrLayershell.keyboardFocus: cc.visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+
+    // solo il pannello è cliccabile: i click fuori passano alle app sotto (niente modale)
+    mask: Region { item: panel }
 
     property int tab: 0
+
+    // posizione del pannello persistita su disco (sopravvive a restart/relogin di qs)
+    FileView {
+        id: posFile
+        path: Quickshell.statePath("controlcenter-pos.json")
+        blockLoading: true            // carica sincrono: posizione pronta al primo toggle
+        onAdapterUpdated: writeAdapter()
+        JsonAdapter {
+            id: pos
+            property real px: -1      // -1 = mai spostato → centra
+            property real py: -1
+        }
+    }
+
+    // colloca il pannello: posizione salvata (clampata allo schermo) o centro al primo avvio
+    function placePanel() {
+        if (content.width <= 0 || content.height <= 0) return;   // finestra non ancora dimensionata
+        if (pos.px >= 0) {
+            panel.x = Math.max(0, Math.min(pos.px, content.width  - panel.width));
+            panel.y = Math.max(0, Math.min(pos.py, content.height - panel.height));
+        } else {
+            panel.x = (content.width  - panel.width)  / 2;
+            panel.y = (content.height - panel.height) / 2;
+        }
+    }
 
     function toggle() {
         if (cc.visible) { cc.visible = false; return; }
@@ -25,6 +56,7 @@ PanelWindow {
             }
         }
         cc.visible = true;
+        placePanel();
     }
 
     GlobalShortcut {
@@ -33,20 +65,19 @@ PanelWindow {
         onPressed: cc.toggle()
     }
 
-    // sfondo: click fuori dal pannello = chiudi
-    MouseArea {
-        anchors.fill: parent
-        onClicked: cc.visible = false
-    }
-
     Item {
+        id: content
         anchors.fill: parent
         focus: cc.visible
         Keys.onEscapePressed: cc.visible = false
 
+        // al primo apri la finestra parte a 0 e viene dimensionata dopo:
+        // riposiziona appena le dimensioni reali sono note
+        onWidthChanged:  if (cc.visible) placePanel()
+        onHeightChanged: if (cc.visible) placePanel()
+
         Rectangle {
             id: panel
-            anchors.centerIn: parent
             width: 380
             height: 460
             radius: Theme.radius
@@ -61,6 +92,26 @@ PanelWindow {
                 anchors.fill: parent
                 anchors.margins: 14
                 spacing: 10
+
+                // grip: trascina il pannello, salva la posizione al rilascio
+                MouseArea {
+                    id: grip
+                    Layout.fillWidth: true
+                    implicitHeight: 16
+                    cursorShape: Qt.SizeAllCursor
+                    drag.target: panel
+                    drag.minimumX: 0
+                    drag.maximumX: content.width  - panel.width
+                    drag.minimumY: 0
+                    drag.maximumY: content.height - panel.height
+                    onReleased: { pos.px = panel.x; pos.py = panel.y; }
+                    Text {
+                        anchors.centerIn: parent
+                        text: "• • •"   // ··· maniglia
+                        color: Theme.comment
+                        font.pixelSize: 14
+                    }
+                }
 
                 RowLayout {
                     Layout.fillWidth: true
