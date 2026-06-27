@@ -19,4 +19,5 @@ ShellRoot {
     ClockWidget { screen: root.targetScreen }
     SysMonitorWidget { screen: root.targetScreen }
     NowPlayingWidget { screen: root.targetScreen }
+    ControlCenter { }
 }
