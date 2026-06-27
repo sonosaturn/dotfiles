@@ -1,16 +1,16 @@
-# 🌃 Tokyo Night — Hyprland dotfiles
+# Tokyo Night — Hyprland dotfiles
 
 Ricing completo di **EndeavourOS + Hyprland** (Wayland), tema **Tokyo Night**.
 Configurazione modulare, animata e coerente su tutto lo stack.
 
-> ⚠️ Questo setup è tarato su un desktop **dual-monitor** (DP-4 2560×1440@60 a
+> Questo setup è tarato su un desktop **dual-monitor** (DP-4 2560×1440@60 a
 > sinistra · DP-3 1920×1080@144 a destra). Adatta `hypr/conf/monitors.conf` al tuo
 > hardware prima dell'uso.
 
 <!-- Aggiungi qui uno screenshot: assets/screenshot.png -->
 <!-- ![screenshot](assets/screenshot.png) -->
 
-## ✨ Componenti
+## Componenti
 
 | Ruolo | Strumento |
 |-------|-----------|
@@ -35,7 +35,7 @@ Overlay non-modale e trascinabile (posizione persistente), a schede:
 - **Calendario** — vista mese
 - **Sessione** — Blocca / Esci / Riavvia / Spegni (conferma su riavvia/spegni)
 
-## 🎨 Palette Tokyo Night
+## Palette Tokyo Night
 
 | | Hex | | Hex |
 |--|--|--|--|
@@ -63,7 +63,7 @@ Overlay non-modale e trascinabile (posizione persistente), a schede:
 
 Set completo: `hypr/conf/keybinds.conf`.
 
-## 📁 Struttura
+## Struttura
 
 ```
 hypr/        # Hyprland (modulare) + hyprlock/hypridle + scripts
@@ -73,7 +73,7 @@ kitty/  rofi/  mako/  swayosd/  fastfetch/
 gtk-3.0/  gtk-4.0/  wireplumber/  zsh/  starship.toml
 ```
 
-## 🚀 Installazione
+## Installazione
 
 I dotfiles vivono in `~/dotfiles` e sono collegati a `~/.config` via symlink.
 
