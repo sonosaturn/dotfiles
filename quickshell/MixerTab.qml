@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Quickshell.Services.Pipewire
 
 Item {
-    // bind dei nodi default così volume/mute/channels diventano validi
+    // bind dei nodi default così volume/mute diventano validi
     PwObjectTracker {
         objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
     }
@@ -11,19 +11,19 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 4
-        spacing: 22
+        spacing: 18
 
-        MixerRow {
+        MixerSection {
             label: "Output"
             cpOn: 0xf028          // nf-fa-volume_up
             cpOff: 0xf026         // nf-fa-volume_off
-            node: Pipewire.defaultAudioSink
+            isSink: true
         }
-        MixerRow {
+        MixerSection {
             label: "Input"
             cpOn: 0xf130          // nf-fa-microphone
             cpOff: 0xf131         // nf-fa-microphone_slash
-            node: Pipewire.defaultAudioSource
+            isSink: false
         }
         Item { Layout.fillHeight: true }
     }
