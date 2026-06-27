@@ -57,7 +57,7 @@ ColumnLayout {
             text: sec.expanded ? "▴" : "▾"
             color: Theme.comment
             font.family: Theme.fontFamily
-            font.pixelSize: 14
+            font.pixelSize: 18
             MouseArea { anchors.fill: parent; onClicked: sec.expanded = !sec.expanded }
         }
     }
@@ -72,7 +72,7 @@ ColumnLayout {
     ColumnLayout {                              // lista device selezionabili
         Layout.fillWidth: true
         Layout.leftMargin: 24
-        spacing: 2
+        spacing: 4
         visible: sec.expanded
 
         Repeater {
@@ -89,7 +89,7 @@ ColumnLayout {
                 elide: Text.ElideRight
                 color: current ? Theme.cyan : Theme.subtext
                 font.family: Theme.fontFamily
-                font.pixelSize: 11
+                font.pixelSize: 13
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
