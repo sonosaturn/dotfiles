@@ -47,8 +47,8 @@ PanelWindow {
         }
     }
 
-    function toggle() {
-        if (cc.visible) { cc.visible = false; return; }
+    function open() {
+        if (cc.visible) return;
         const fm = Hyprland.focusedMonitor;
         if (fm) {
             for (let i = 0; i < Quickshell.screens.length; i++) {
@@ -59,10 +59,22 @@ PanelWindow {
         placePanel();
     }
 
+    function toggle() {
+        if (cc.visible) { cc.visible = false; return; }
+        open();
+    }
+
     GlobalShortcut {
         appid: "quickshell"
         name: "controlcenter"
         onPressed: cc.toggle()
+    }
+
+    // apre direttamente sul tab Sessione (usato dall'icona power di Waybar)
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "controlcenter-session"
+        onPressed: { cc.tab = 2; cc.open(); }
     }
 
     Item {
@@ -118,10 +130,9 @@ PanelWindow {
                     spacing: 6
                     Repeater {
                         model: [
-                            { icon: "", label: "Audio" },
-                            { icon: "", label: "Luce" },
-                            { icon: "", label: "Cal" },
-                            { icon: "", label: "Sess" }
+                            { icon: 0xf028, label: "Audio" },   // volume
+                            { icon: 0xf073, label: "Cal" },     // calendario
+                            { icon: 0xf011, label: "Sess" }     // power
                         ]
                         delegate: Rectangle {
                             required property int index
@@ -132,7 +143,7 @@ PanelWindow {
                             color: cc.tab === index ? Theme.surface1 : "transparent"
                             Text {
                                 anchors.centerIn: parent
-                                text: modelData.icon + "  " + modelData.label
+                                text: String.fromCodePoint(modelData.icon) + "  " + modelData.label
                                 color: cc.tab === index ? Theme.cyan : Theme.subtext
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 13
@@ -147,7 +158,6 @@ PanelWindow {
                     Layout.fillHeight: true
                     currentIndex: cc.tab
                     MixerTab {}
-                    LightTab {}
                     CalendarTab {}
                     SessionTab {}
                 }

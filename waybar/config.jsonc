@@ -120,8 +120,8 @@
   },
   "custom/power": {
     "format": "",
-    "on-click": "wlogout -b 5",
-    "tooltip-format": "Power menu (SUPER+X)"
+    "on-click": "hyprctl dispatch global quickshell:controlcenter-session",
+    "tooltip-format": "Dashboard → Sessione"
   },
   "custom/swaync": {
     "format": "{icon} {}",
