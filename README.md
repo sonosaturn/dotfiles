@@ -79,13 +79,18 @@ I dotfiles vivono in `~/dotfiles` e sono collegati a `~/.config` via symlink.
 
 ```bash
 git clone https://github.com/sonosaturn/dotfiles ~/dotfiles
+cd ~/dotfiles
+./install.sh
 ```
 
-Poi collega le cartelle in `~/.config` (es. `ln -s ~/dotfiles/hypr ~/.config/hypr`).
-Lo **script di bootstrap** per installare pacchetti e creare i symlink in automatico
-arriva a breve (`install.sh`).
+`install.sh` installa i pacchetti (pacman + AUR via yay, installa yay se manca) e
+crea i symlink. È idempotente: i file esistenti non-symlink vengono salvati in `*.bak`
+prima del collegamento.
 
-I wallpaper-video **non** sono nel repo (binari): vanno in `~/Videos/wallpapers/`.
+Dopo l'installazione:
+- rieffettua il login per entrare in Hyprland;
+- i wallpaper-video **non** sono nel repo (binari): mettili in `~/Videos/wallpapers/`;
+- adatta `hypr/conf/monitors.conf` al tuo hardware.
 
 ---
 
