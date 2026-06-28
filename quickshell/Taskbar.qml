@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Io
 import "lib/taskmodel.js" as TM
 
 PanelWindow {
@@ -23,7 +24,7 @@ PanelWindow {
     readonly property bool revealed: hovered && !fullscreenHere
     onRevealedChanged: TaskbarState.setRevealed(bar.screenName, revealed)
 
-    readonly property var entries: TM.deriveEntries(HyprWindows.windows, [], bar.screenName)
+    readonly property var entries: TM.deriveEntries(HyprWindows.windows, bar.pinned, bar.screenName)
 
     // ponytail: revealStrip is a sibling of content (not a child) so its window-space coords
     // are stable: always at y = [height-3, height]. Brief put it inside content which placed it
@@ -41,6 +42,21 @@ PanelWindow {
     HoverHandler {
         id: hh
         onHoveredChanged: { if (hh.hovered) bar.hovered = true; else hideTimer.restart(); }
+    }
+
+    property var pinned: pinAdapter.pinned
+    FileView {
+        id: pinFile
+        path: Quickshell.statePath("taskbar-pins.json")
+        blockLoading: true
+        onAdapterUpdated: writeAdapter()
+        JsonAdapter { id: pinAdapter; property var pinned: [] }
+    }
+    function togglePin(appId) {
+        var arr = pinAdapter.pinned.slice();
+        var i = arr.indexOf(appId);
+        if (i >= 0) arr.splice(i, 1); else arr.push(appId);
+        pinAdapter.pinned = arr;
     }
 
     // Sliding content — avoids anchors.fill conflict with manual y
@@ -62,12 +78,14 @@ PanelWindow {
             RowLayout {
                 anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
                 spacing: 6
+                StartButton {}
                 Repeater {
                     model: bar.entries
                     delegate: TaskbarEntry {
                         required property var modelData
                         entry: modelData
                         screenName: bar.screenName
+                        taskbar: bar
                     }
                 }
                 Item { Layout.fillWidth: true }
