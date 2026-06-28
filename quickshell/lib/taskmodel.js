@@ -1,27 +1,55 @@
 .pragma library
-// deriveEntries(windows, pinned, screenName) → voci ordinate della taskbar di uno schermo.
-// Ordine: launcher (app fissate SENZA finestre), finestre visibili del monitor, minimizzate (ovunque).
+// deriveEntries(windows, pinned, screenName) → voci ordinate della taskbar.
+// Ordine: launcher (app fissate SENZA finestre aperte), poi un app-group per appId
+// (ordine di prima apparizione nell'array windows). screenName non filtra; serve
+// solo ai chiamanti per la semantica di restore ("dove sono").
 function deriveEntries(windows, pinned, screenName) {
     windows = windows || [];
-    pinned = pinned || [];
-    var openAppIds = {};
-    for (var i = 0; i < windows.length; i++) openAppIds[windows[i].appId] = true;
+    pinned  = pinned  || [];
+
+    // Costruisce mappa appId → [window, ...] mantenendo l'ordine di prima comparsa.
+    var appOrder = [];
+    var appMap   = {};
+    for (var i = 0; i < windows.length; i++) {
+        var w = windows[i];
+        if (!appMap[w.appId]) {
+            appMap[w.appId] = [];
+            appOrder.push(w.appId);
+        }
+        appMap[w.appId].push({
+            address:   w.address,
+            title:     w.title,
+            focused:   !!w.activated,
+            minimized: !!w.minimized
+        });
+    }
 
     var entries = [];
-    for (var p = 0; p < pinned.length; p++)
-        if (!openAppIds[pinned[p]]) entries.push({ kind: "launcher", appId: pinned[p] });
 
-    for (var v = 0; v < windows.length; v++) {
-        var w = windows[v];
-        if (!w.minimized && w.monitorName === screenName)
-            entries.push({ kind: "window", address: w.address, appId: w.appId,
-                           title: w.title, focused: !!w.activated, minimized: false });
+    // Launcher: app fissate senza finestre aperte.
+    for (var p = 0; p < pinned.length; p++) {
+        if (!appMap[pinned[p]])
+            entries.push({ kind: "launcher", appId: pinned[p] });
     }
-    for (var m = 0; m < windows.length; m++) {
-        var wm = windows[m];
-        if (wm.minimized)
-            entries.push({ kind: "window", address: wm.address, appId: wm.appId,
-                           title: wm.title, focused: false, minimized: true });
+
+    // App group: una voce per appId, tutte le finestre (visibili + minimizzate).
+    for (var a = 0; a < appOrder.length; a++) {
+        var id   = appOrder[a];
+        var wins = appMap[id];
+        var anyFocused = false, allMin = true;
+        for (var j = 0; j < wins.length; j++) {
+            if (wins[j].focused)    anyFocused = true;
+            if (!wins[j].minimized) allMin     = false;
+        }
+        entries.push({
+            kind:         "app",
+            appId:        id,
+            windows:      wins,
+            focused:      anyFocused,
+            allMinimized: allMin,
+            count:        wins.length
+        });
     }
+
     return entries;
 }

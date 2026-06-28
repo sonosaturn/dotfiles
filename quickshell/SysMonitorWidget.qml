@@ -12,7 +12,12 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
 
     anchors { bottom: true; right: true }
-    margins { bottom: 40; right: 40 }
+    // Si sposta su quando la taskbar dello stesso monitor è rivelata (TaskbarState),
+    // così non si sovrappongono. Behavior sull'intermedia → margins.bottom segue animato.
+    readonly property bool taskbarRevealed: w.screen ? !!TaskbarState.revealed[w.screen.name] : false
+    property real bottomMargin: 40 + (taskbarRevealed ? Theme.taskbarHeight + 12 : 0)
+    Behavior on bottomMargin { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    margins { bottom: w.bottomMargin; right: 40 }
     implicitWidth: card.implicitWidth
     implicitHeight: card.implicitHeight
 

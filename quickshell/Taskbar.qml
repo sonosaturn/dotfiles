@@ -12,8 +12,14 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "qs-taskbar"
-    exclusionMode: ExclusionMode.Ignore
-    exclusiveZone: 0
+    // Da rivelata riserva spazio (Theme.taskbarHeight) → Hyprland ridimensiona le
+    // finestre tiling per restare tangenti alla barra; da nascosta non riserva nulla
+    // (finestre a tutta altezza, "come quando è chiusa").
+    exclusionMode: ExclusionMode.Normal
+    exclusiveZone: bar.revealed ? Theme.taskbarHeight : 0
+    // In fullscreen la barra sparisce del tutto su quel monitor: niente surface,
+    // niente sliver di reveal da 3px col bordo blu, niente zona-hover.
+    visible: !bar.fullscreenHere
 
     anchors { left: true; right: true; bottom: true }
     implicitHeight: Theme.taskbarHeight
