@@ -92,6 +92,20 @@ Dopo l'installazione:
 - i wallpaper-video **non** sono nel repo (binari): mettili in `~/Videos/wallpapers/`;
 - adatta `hypr/conf/monitors.conf` al tuo hardware.
 
+### Titlebar finestre (hyprbars)
+
+Le titlebar coi pulsanti (minimizza/max/chiudi) usano il plugin Hyprland **hyprbars**,
+installazione una-tantum:
+
+```bash
+hyprpm add https://github.com/hyprwm/hyprland-plugins
+hyprpm enable hyprbars
+```
+
+Viene caricato al login da `exec-once = hyprpm reload -n` (in `autostart.conf`).
+**Dopo ogni aggiornamento di Hyprland** rieseguire `hyprpm update` (ricompila i plugin
+per la nuova versione).
+
 ---
 
 *Tema: [Tokyo Night](https://github.com/folke/tokyonight.nvim). Font: JetBrainsMono Nerd Font.*
