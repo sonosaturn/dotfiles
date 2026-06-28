@@ -64,21 +64,10 @@ PanelWindow {
                 spacing: 6
                 Repeater {
                     model: bar.entries
-                    delegate: Rectangle {
+                    delegate: TaskbarEntry {
                         required property var modelData
-                        implicitWidth: 40; implicitHeight: 40
-                        radius: 10
-                        color: modelData.focused ? Theme.surface1 : "transparent"
-                        opacity: modelData.minimized ? 0.5 : 1.0
-                        Text {
-                            anchors.centerIn: parent
-                            text: (modelData.appId || "?").slice(0, 2)
-                            color: Theme.fg; font.family: Theme.fontFamily; font.pixelSize: 14
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: if (modelData.kind === "window") HyprWindows.toggle(modelData, bar.screenName)
-                        }
+                        entry: modelData
+                        screenName: bar.screenName
                     }
                 }
                 Item { Layout.fillWidth: true }
