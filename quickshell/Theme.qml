@@ -25,5 +25,6 @@ Singleton {
     readonly property color border:   "#7aa2f7"
     readonly property int   borderWidth: 1
     readonly property int   radius:   18
+    readonly property int   taskbarHeight: 56
     readonly property string fontFamily: "JetBrainsMono Nerd Font"
 }

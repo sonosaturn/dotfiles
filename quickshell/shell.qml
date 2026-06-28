@@ -20,4 +20,8 @@ ShellRoot {
     SysMonitorWidget { screen: root.targetScreen }
     NowPlayingWidget { screen: root.targetScreen }
     ControlCenter { }
+    Variants {
+        model: Quickshell.screens
+        delegate: Taskbar { modelData: modelData }
+    }
 }
