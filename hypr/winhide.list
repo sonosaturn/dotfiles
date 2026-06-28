@@ -1,0 +1,4 @@
+# winhide.list — classi (app) che SUPER+C NASCONDE invece di chiudere.
+# Una classe per riga (case-insensitive); righe vuote e # ignorate.
+# La classe è quella di `hyprctl activewindow` (campo .class).
+Spotify
