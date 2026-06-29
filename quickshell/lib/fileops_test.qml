@@ -15,7 +15,9 @@ QtObject {
         eq(F.rename("/d/old name.txt", "new'name.txt"),
            ["gio","rename","/d/old name.txt","new'name.txt"], "rename");
         eq(F.copy(["/d/a.txt","/d/b c.txt"], "/dest"),
-           ["gio","copy","-p","/d/a.txt","/d/b c.txt","/dest"], "copy");
+           ["cp","-a","/d/a.txt","/d/b c.txt","/dest"], "copy");
+        eq(F.copyOne("/d/a b.txt", "/d/a b (copia).txt"),
+           ["cp","-a","/d/a b.txt","/d/a b (copia).txt"], "copyOne");
         eq(F.move(["/d/a.txt"], "/dest"),
            ["gio","move","/d/a.txt","/dest"], "move");
         eq(F.trash(["/d/a.txt","/d/b.txt"]),
@@ -29,6 +31,23 @@ QtObject {
         eq(F.properties("/d/a.txt"), ["thunar","/d/a.txt"], "properties");
         eq(F.wallpaperNext("/home/x"),
            ["/home/x/.config/hypr/scripts/wallpaper.sh","--next"], "wallpaperNext");
+
+        // clipboard di sistema: payload "<op>\nfile://<uri>" con spazi URI-encoded
+        eq(F.clipSet("copy", ["/d/a b.txt", "/d/c.txt"]),
+           ["wl-copy","--type","x-special/gnome-copied-files",
+            "copy\nfile:///d/a%20b.txt\nfile:///d/c.txt"], "clipSet");
+        eq(F.clipGet(),
+           ["wl-paste","--no-newline","--type","x-special/gnome-copied-files"], "clipGet");
+        eq(F.clipClear(), ["wl-copy","--clear"], "clipClear");
+        // parseClip decodifica gli URI e riconosce l'operazione
+        eq(F.parseClip("cut\nfile:///d/a%20b.txt\nfile:///d/c.txt"),
+           { op: "cut", paths: ["/d/a b.txt", "/d/c.txt"] }, "parseClip");
+        eq(F.parseClip(""), null, "parseClip empty");
+        eq(F.parseClip("copy"), null, "parseClip no-paths");
+        // round-trip: payload di clipSet → parseClip
+        var payload = F.clipSet("copy", ["/d/a b.txt"])[3];
+        eq(F.parseClip(payload), { op: "copy", paths: ["/d/a b.txt"] }, "clip round-trip");
+
         console.log("fileops_test: ALL PASS");
     }
 }

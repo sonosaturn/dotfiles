@@ -11,9 +11,6 @@ Singleton {
     readonly property string home: Quickshell.env("HOME")
     readonly property string desktopDir: home + "/Desktop"
     property var files: []
-    property var clipboard: ({ paths: [], mode: "" })   // mode: "copy" | "cut"
-
-    signal renameRequested(string name)
 
     FolderListModel {
         id: fl
@@ -51,6 +48,19 @@ Singleton {
 
     function refresh() { rebuild(); }
 
+    // legge la clipboard di sistema in modo asincrono (Process usa-e-getta che cattura stdout)
+    property Component readComp: Component {
+        Process {
+            property var cb
+            stdout: StdioCollector { id: sc }
+            onExited: function(code) { if (cb) cb(code === 0 ? sc.text : ""); destroy(); }
+        }
+    }
+    function readClipboard(cb) {
+        var p = readComp.createObject(model, { command: F.clipGet(), cb: cb });
+        p.running = true;
+    }
+
     // --- helpers ---
     function exists(name) {
         for (var i = 0; i < files.length; i++) if (files[i].name === name) return true;
@@ -68,24 +78,49 @@ Singleton {
         run(item.isDir ? F.openDir(item.path) : F.openFile(item.path));
     }
     function rename(path, newName) { if (newName && newName.length) run(F.rename(path, newName)); }
-    function setClipboard(paths, mode) { model.clipboard = { paths: paths.slice(), mode: mode }; }
-    function paste() {
-        var c = model.clipboard;
-        if (!c.paths.length) return;
-        run(c.mode === "cut" ? F.move(c.paths, desktopDir) : F.copy(c.paths, desktopDir));
-        if (c.mode === "cut") model.clipboard = { paths: [], mode: "" };
+
+    // copia/taglia → clipboard di sistema (interop con Thunar e altri file manager)
+    function setClipboard(paths, mode) { if (paths.length) run(F.clipSet(mode, paths)); }
+
+    function _parentOf(p) { return p.substring(0, p.lastIndexOf("/")); }
+    function _splitName(n) {
+        var dot = n.lastIndexOf(".");
+        return (dot > 0) ? { base: n.substring(0, dot), ext: n.substring(dot) } : { base: n, ext: "" };
     }
+    function _pasteOne(op, src) {
+        var name = src.split("/").pop();
+        if (_parentOf(src) === desktopDir) {
+            // sorgente già sul desktop: cut → niente (è già qui); copia → duplicato "(copia)"
+            if (op === "cut") return;
+            var sp = _splitName(name);
+            var dn = uniqueName(sp.base + " (copia)", sp.ext);
+            run(F.copyOne(src, desktopDir + "/" + dn));
+        } else {
+            run(op === "cut" ? F.move([src], desktopDir) : F.copy([src], desktopDir));
+        }
+    }
+    // incolla dalla clipboard di sistema sul desktop (legge wl-paste, poi gio copy/move)
+    function paste() {
+        readClipboard(function(text) {
+            var c = F.parseClip(text);
+            if (!c) return;
+            for (var i = 0; i < c.paths.length; i++) _pasteOne(c.op, c.paths[i]);
+            if (c.op === "cut") run(F.clipClear());   // un taglio si consuma dopo l'incolla
+        });
+    }
+    function showInThunar(path) { run(F.openDir(_parentOf(path))); }
     function trash(paths)  { if (paths.length) run(F.trash(paths)); }
     function remove(paths) { if (paths.length) run(F.remove(paths)); }
+    // creano e ritornano il nome: il Desktop chiamante seleziona + avvia la rinomina
     function newFolder() {
         var name = uniqueName("Nuova cartella", "");
         run(F.mkdir(desktopDir + "/" + name));
-        renameRequested(name);
+        return name;
     }
     function newFile() {
         var name = uniqueName("Nuovo file", ".txt");
         run(F.touch(desktopDir + "/" + name));
-        renameRequested(name);
+        return name;
     }
     function compress(paths) {
         if (!paths.length) return;

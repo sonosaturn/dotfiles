@@ -18,6 +18,12 @@ Item {
     signal clicked(var mouse)
     signal doubleClicked()
     signal rightClicked(real gx, real gy)
+    signal dragMoved(real dx, real dy)
+    signal dragReleased()
+    signal editingStarted()
+    signal editingEnded()
+
+    onEditingChanged: editing ? editingStarted() : editingEnded()
 
     // immagini → anteprima del file stesso; cartelle/altri → icona freedesktop (vuota se
     // non risolta → fallback glifo Nerd Font, come TaskbarEntry)
@@ -51,12 +57,14 @@ Item {
         // thumbnail / icona
         Item {
             width: parent.width; height: 48
+            clip: true
             Image {
                 anchors.centerIn: parent
                 visible: icon.isImage
+                width: 48; height: 48
                 source: icon.isImage ? "file://" + item.path : ""
-                sourceSize.width: 48; sourceSize.height: 48
-                fillMode: Image.PreserveAspectFit; asynchronous: true
+                sourceSize.width: 64; sourceSize.height: 64
+                fillMode: Image.PreserveAspectCrop; asynchronous: true
             }
             IconImage {
                 anchors.centerIn: parent
@@ -117,13 +125,22 @@ Item {
         enabled: !icon.editing
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         property bool moved: false
+        property real px: 0
+        property real py: 0
         drag.target: icon
         drag.threshold: 6
-        onPressed: (m) => { moved = false; if (m.button === Qt.LeftButton) icon.clicked(m); }
-        onPositionChanged: if (drag.active) moved = true
+        onPressed: (m) => { moved = false; px = icon.x; py = icon.y;
+                            if (m.button === Qt.LeftButton) icon.clicked(m); }
+        onPositionChanged: {
+            if (drag.active) {
+                moved = true;
+                icon.dragMoved(icon.x - px, icon.y - py);   // trascina con sé le altre selezionate
+                px = icon.x; py = icon.y;
+            }
+        }
         onReleased: (m) => {
-            if (m.button === Qt.LeftButton && moved)
-                DesktopState.setPos(icon.screenName, item.name, icon.x, icon.y);
+            // lo snap-to-grid + persistenza di TUTTE le selezionate (incl. questa) lo fa il Desktop
+            if (m.button === Qt.LeftButton && moved) icon.dragReleased();
         }
         onDoubleClicked: (m) => { if (m.button === Qt.LeftButton) icon.doubleClicked(); }
         onClicked: (m) => { if (m.button === Qt.RightButton) icon.rightClicked(m.x, m.y); }

@@ -16,6 +16,11 @@ ShellRoot {
     Component.onCompleted: console.log("quickshell: targetScreen =",
         root.targetScreen ? root.targetScreen.name : "none")
 
+    // Desktop icons (layer bottom, una per monitor) — sotto a tutto
+    Variants {
+        model: Quickshell.screens
+        delegate: Desktop { modelData: modelData }
+    }
     ClockWidget { screen: root.targetScreen }
     SysMonitorWidget { screen: root.targetScreen }
     NowPlayingWidget { screen: root.targetScreen }
